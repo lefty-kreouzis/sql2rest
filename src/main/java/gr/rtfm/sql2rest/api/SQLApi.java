@@ -19,6 +19,10 @@ public class SQLApi {
     @Autowired
     SQLService sqlService;
 
+    public void setSqlService(SQLService sqlService) {
+        this.sqlService = sqlService;
+    }
+
     @PostMapping("/select")
     public List<Map<String, Object>> executeSQL(@RequestBody SQLRequest request) 
     {
