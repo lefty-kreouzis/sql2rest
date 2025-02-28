@@ -3,7 +3,6 @@ package gr.rtfm.sql2rest.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +23,8 @@ import org.springframework.dao.TransientDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+
+import gr.rtfm.sql2rest.model.SQLParameter;
 
 public class SQLUtilsTest {
 
@@ -159,5 +160,61 @@ public class SQLUtilsTest {
         //         .debug("queryForRowMaps(): template=" + namedParameterJdbcTemplate + " namedParams=" + namedParameters);
         assertEquals(expectedRows, result);
     }
+	@Test
+	public void testExecuteUpdateSQL() {
+		String sql = "UPDATE table SET column = :value WHERE id = :id";
+		List<SQLParameter> parameters = List.of(
+			new SQLParameter("value", "newValue"),
+			new SQLParameter("id", 1)
+		);
+		Map<String, Object> namedParameters = new HashMap<>();
+		namedParameters.put("value", "newValue");
+		namedParameters.put("id", 1);
+
+		when(namedParameterJdbcTemplate.update(sql, namedParameters)).thenReturn(1);
+
+		int rowsAffected = sqlUtils.executeUpdateSQL(namedParameterJdbcTemplate, sql, parameters);
+
+		assertEquals(1, rowsAffected);
+	}
+
+	@Test
+	public void testExecuteUpdateSQLWithNoRowsAffected() {
+		String sql = "UPDATE table SET column = :value WHERE id = :id";
+		List<SQLParameter> parameters = List.of(
+			new SQLParameter("value", "newValue"),
+			new SQLParameter("id", 1)
+		);
+		Map<String, Object> namedParameters = new HashMap<>();
+		namedParameters.put("value", "newValue");
+		namedParameters.put("id", 1);
+
+		when(namedParameterJdbcTemplate.update(sql, namedParameters)).thenReturn(0);
+
+		int rowsAffected = sqlUtils.executeUpdateSQL(namedParameterJdbcTemplate, sql, parameters);
+
+		assertEquals(0, rowsAffected);
+	}
+
+	@Test
+	public void testExecuteUpdateSQLWithException() {
+		String sql = "UPDATE table SET column = :value WHERE id = :id";
+		List<SQLParameter> parameters = List.of(
+			new SQLParameter("value", "newValue"),
+			new SQLParameter("id", 1)
+		);
+		Map<String, Object> namedParameters = new HashMap<>();
+		namedParameters.put("value", "newValue");
+		namedParameters.put("id", 1);
+
+		when(namedParameterJdbcTemplate.update(sql, namedParameters)).thenThrow(new TransientDataAccessException("Transient error") {});
+
+		try {
+			sqlUtils.executeUpdateSQL(namedParameterJdbcTemplate, sql, parameters);
+		} catch (TransientDataAccessException e) {
+			assertEquals("Transient error", e.getMessage());
+		}
+	}
+
 
 }

@@ -16,7 +16,8 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class SQLService {
 
-    private final org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(this.getClass());
+    private org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+    
 
     @Autowired
     SQLUtils sqlUtils; 
@@ -45,10 +46,17 @@ public class SQLService {
 
     public List<Map<String, Object>> executeSQL(SQLRequest request) {
 
-        log.debug("Executing SQL: " + request.getSql());
+        log.info("Executing SQL: {}", request.getSql());
         List<Map<String, Object>> result = sqlUtils.executeSQL(template, request.getSql(), request.getParameters());
-        log.debug("Returned " + result.size() + " rows");
+        log.info("Returned {} rows",result.size());
         return result;
+    }
+
+    public int update(SQLRequest request) {
+        log.info("Executing SQL: {}", request.getSql());
+        int nRows = sqlUtils.executeUpdateSQL(template, request.getSql(), request.getParameters());
+        log.info("Updated {} rows", nRows);
+        return nRows;
     }
 
 

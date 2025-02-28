@@ -7,14 +7,12 @@ package gr.rtfm.sql2rest.utils;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
@@ -25,12 +23,9 @@ import javax.sql.rowset.serial.SerialException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.TransientDataAccessException;
-import org.springframework.jdbc.CannotGetJdbcConnectionException;
-import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.jdbc.support.rowset.SqlRowSetMetaData;
 import org.springframework.stereotype.Service;
@@ -41,8 +36,8 @@ import jakarta.annotation.PostConstruct;
 @Service("sqlUtils")
 public class SQLUtils {
 
-	private final org.apache.commons.logging.Log log = org.apache.commons.logging.LogFactory.getLog(this.getClass());
-
+	private org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(this.getClass());
+	
 	@PostConstruct
 	public void init() {
 		if (log.isInfoEnabled()) {
@@ -70,7 +65,8 @@ public class SQLUtils {
 				if (log.isWarnEnabled()) {
 					log.warn("Exception during execution", e);
 				}
-				throw new DataAccessException("Exception during execution", e) {};
+				throw new DataAccessException("Exception during execution", e) {
+				};
 			}
 			nRetries++;
 			try {
@@ -87,29 +83,34 @@ public class SQLUtils {
 
 	public synchronized SqlRowSet query(JdbcTemplate template, String sql, Object... args) {
 		if (log.isDebugEnabled()) {
-			log.debug("SQLUtils.query(): Query:" + sql);
+			log.debug("Query:" + sql);
 		}
 
-		return executeWithRetry(() -> {
+		SqlRowSet rowSet = executeWithRetry(() -> {
 			if (args == null) {
 				return template.queryForRowSet(sql);
 			} else {
 				return template.queryForRowSet(sql, args);
 			}
 		});
-	}
 
-	
+		log.debug(sql + " => " + rowSet);
+		return rowSet;
+	}
 
 	public synchronized SqlRowSet query(JdbcTemplate template, String sql) {
 		if (log.isDebugEnabled()) {
-			log.debug("SQLUtils.query(): Query:" + sql);
+			log.debug("Query:" + sql);
 		}
 
-		return executeWithRetry(() -> template.queryForRowSet(sql));
+		SqlRowSet rowSet = executeWithRetry(() -> template.queryForRowSet(sql));
+
+		log.debug(sql + " => " + rowSet);
+		return rowSet;
 	}
 
 	public Map<String, Object> argsToNamedParameters(Object... args) {
+		log.debug("args=" + args);
 		Map<String, Object> namedParameters = new HashMap<>();
 		for (int i = 0; i < args.length; i += 2) {
 			String argName = (String) args[i];
@@ -121,6 +122,7 @@ public class SQLUtils {
 			}
 			namedParameters.put(argName, value);
 		}
+		log.debug("namedParameters=" + namedParameters);
 		return namedParameters;
 	}
 
@@ -150,11 +152,7 @@ public class SQLUtils {
 		}
 
 		return executeWithRetry(() -> {
-			if (args == null) {
-				return template.query(sql, rowMapper);
-			} else {
-				return template.query(sql, args, rowMapper);
-			}
+			return template.query(sql, rowMapper, args);
 		});
 	}
 
@@ -301,5 +299,16 @@ public class SQLUtils {
 
 		List<Map<String, Object>> rows = template.queryForList(sql, namedParameters);
 		return rows;
+	}
+
+	public int executeUpdateSQL(NamedParameterJdbcTemplate template, String sql,
+			List<SQLParameter> parameters) {
+		Map<String, Object> namedParameters = argsToNamedParameters(parameters);
+		if (log.isDebugEnabled()) {
+			log.debug("executeSQL(): sql=" + sql + " namedParams=" + namedParameters);
+		}
+
+		int nRows = template.update(sql, namedParameters);
+		return nRows;
 	}
 }

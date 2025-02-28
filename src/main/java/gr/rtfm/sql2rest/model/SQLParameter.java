@@ -18,4 +18,11 @@ public class SQLParameter {
         this.value = value;
     }
 
+    public SQLParameter(String name, Object value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public SQLParameter() {
+    }
 }

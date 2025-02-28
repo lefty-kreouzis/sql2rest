@@ -1,15 +1,27 @@
 package gr.rtfm.sql2rest.service;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import javax.sql.DataSource;
 
-import org.checkerframework.checker.units.qual.s;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+
+import gr.rtfm.sql2rest.model.SQLParameter;
 import gr.rtfm.sql2rest.model.SQLRequest;
 import gr.rtfm.sql2rest.utils.SQLUtils;
 
@@ -58,5 +70,27 @@ public class SQLServiceTest {
 
         assertEquals(expectedResult, result);
         verify(sqlUtils, times(1)).executeSQL(any(NamedParameterJdbcTemplate.class), eq(request.getSql()), eq(request.getParameters()));
+    }
+
+    @Test
+    public void testUpdate() {
+        SQLRequest request = new SQLRequest();
+        request.setSql("UPDATE users SET name = :name WHERE id = :id");
+        List<SQLParameter> parameters = new LinkedList<>();
+        parameters.add(new SQLParameter("name", "John Doe"));
+        parameters.add(new SQLParameter("id", 1));
+        request.setParameters(parameters);
+
+        sqlService.setDataSource(dataSource);
+        sqlService.setSqlUtils(sqlUtils);
+        sqlService.setTemplate(template);
+
+        when(sqlUtils.executeUpdateSQL(any(NamedParameterJdbcTemplate.class), eq(request.getSql()), eq(request.getParameters())))
+            .thenReturn(1);
+
+        int result = sqlService.update(request);
+
+        assertEquals(1, result);
+        verify(sqlUtils, times(1)).executeUpdateSQL(any(NamedParameterJdbcTemplate.class), eq(request.getSql()), eq(request.getParameters()));
     }
 }
