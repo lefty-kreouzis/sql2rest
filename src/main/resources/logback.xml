@@ -5,7 +5,7 @@
     ​
     <springProperty scope="context" name="springAppName" source="spring.application.name"/>
     <!-- Example for logging into the build folder of your project -->
-    <property name="LOG_FILE" value="slm"/>​
+    <property name="LOG_FILE" value="sql2rest"/>​
 
     <!-- You can override this to have a custom pattern -->
     <property name="CONSOLE_LOG_PATTERN"
