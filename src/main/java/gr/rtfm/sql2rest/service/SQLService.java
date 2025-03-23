@@ -59,5 +59,11 @@ public class SQLService {
         return nRows;
     }
 
+    public int delete(SQLRequest request) {
+        log.info("Executing SQL: {}", request.getSql());
+        int nRows = sqlUtils.executeUpdateSQL(template, request.getSql(), request.getParameters());
+        log.info("Updated {} rows", nRows);
+        return nRows;
+    }
 
 }
