@@ -95,8 +95,8 @@ public class SQLApi {
     
 
     
-    @GetMapping("/dencrypt")
-    public String dencryptPassword(@RequestParam(value = "passwd") String passwd, 
+    @GetMapping("/decrypt")
+    public String decryptPassword(@RequestParam(value = "passwd") String passwd, 
     @RequestParam(value = "key", required = false) String key) {
         String encrypted;
         if ( StringUtils.isEmpty(key) )

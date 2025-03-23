@@ -2,9 +2,9 @@
 
 ## Introduction
 
-SQL2Rest is a simple utility to allow users to execute SQL select and Update statements over a Restful API
+SQL2Rest is a simple utility to allow users to execute SQL select and update and delete statements over a Restful API
 
-The key Data structure is the SQLRequest whose JSON representation is
+The key data structure is the SQLRequest whose JSON representation is
 
 ```json
 {
@@ -18,7 +18,7 @@ The key Data structure is the SQLRequest whose JSON representation is
 }
 ```
 
-The SQL is the the SQL statement to be executed. It supports name parameters using the ``:<parameter>`` syntax
+The SQL is the the SQL statement to be executed. It supports name parameters using the ``:<parameter_name>`` syntax
 
 The values of the parameters can be set by adding them in the ``parameters`` array 
 
@@ -38,7 +38,30 @@ In case of a select statement the returned rows are encoded into a JSon array:
 ]
 ```
 
-In case of an update statement the number of rows updated is returned as an Integer
+In case of an update or delete statement the number of rows affected is returned as an Integer
+
+## ReSTful endpoints
+
+### /update
+
+![alt text](image.png)
+
+### /select
+
+![alt text](image-1.png)
+
+### /delete
+
+![alt text](image-2.png)
+
+### /encrypt
+
+![alt text](image-3.png)
+
+### /decrypt
+
+![alt text](image-4.png)
+
 
 ## Configuration
 
