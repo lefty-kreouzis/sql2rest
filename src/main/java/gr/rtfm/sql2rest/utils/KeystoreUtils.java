@@ -42,6 +42,7 @@ public class KeystoreUtils {
             log.info("Keystore loaded successfully");
         } catch (Exception e) {
             log.error("Error loading keystore", e);
+            keyStore = null;
         }
     }
  

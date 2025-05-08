@@ -98,16 +98,16 @@ public class SQLApi {
     @GetMapping("/decrypt")
     public String decryptPassword(@RequestParam(value = "passwd") String passwd, 
     @RequestParam(value = "key", required = false) String key) {
-        String encrypted;
+        String decrypted;
         if ( StringUtils.isEmpty(key) )
         {
             log.info("Decrypting password with default key");
-            encrypted = aesUtils.decrypt(passwd);
+            decrypted = aesUtils.decrypt(passwd);
         }
         else
         {
-            encrypted = aesUtils.decrypt(passwd, key);
+            decrypted = aesUtils.decrypt(passwd, key);
         }
-        return encrypted;
+        return decrypted;
     }
 }
