@@ -90,6 +90,7 @@ There are two ReST endpoints ``/encrypt`` and ``/decrypt`` that allow one to enc
 If the value of ``password.safe`` is ``plain`` then the value in the ``spring.datasource.password`` property holds the plaintext password
 
 ```properties
+```properties
 spring.application.name=sql2rest
 
 password.safe=keystore
@@ -98,6 +99,52 @@ keystore.password=changeit
 
 #password.safe=aes
 #encryption.key=H3ll0SLMH0wAr3You?
+```
+
+## Docker Setup
+
+This project includes a Docker Compose file to run an Oracle XE database for development and testing purposes.
+
+### Prerequisites
+
+- Docker and Docker Compose installed on your system
+
+### Running Oracle XE with Docker Compose
+
+1. Start the Oracle database container:
+
+```bash
+$ docker-compose up -d
+```
+
+2. The database will be accessible with the following connection details:
+
+- Host: localhost
+- Port: 1521
+- Service Name: XE
+- SYS Password: oracle
+- Application User: sql2rest
+- Application Password: sql2rest
+
+3. Stop the database container:
+
+```bash
+$ docker-compose down
+```
+
+4. To remove the volumes and data:
+
+```bash
+$ docker-compose down -v
+```
+
+### Database Initialization
+
+The database will be initialized with:
+- A sample `sql2rest_test` table
+- Three test records
+
+The initialization scripts are located in the `init-scripts` directory and will be executed automatically when the container starts for the first time.
 
 #password.safe=plain
 

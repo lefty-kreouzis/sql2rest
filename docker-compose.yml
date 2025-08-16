@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  oracle-xe:
+    image: gvenzl/oracle-xe:latest
+    container_name: oracle-xe
+    environment:
+      - ORACLE_PASSWORD=oracle
+      - ORACLE_DATABASE=XE
+      - APP_USER=sql2rest
+      - APP_USER_PASSWORD=sql2rest
+    ports:
+      - "1521:1521"
+      - "5500:5500" # EM Express
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./init-scripts:/container-entrypoint-initdb.d # Optional: for init scripts
+    healthcheck:
+      test: ["CMD", "sqlplus", "-L", "sys/oracle@//localhost:1521/XE as sysdba", "@healthcheck.sql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+
+volumes:
+  oracle-data:
+    driver: local

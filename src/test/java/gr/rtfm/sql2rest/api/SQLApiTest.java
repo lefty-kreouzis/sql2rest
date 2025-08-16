@@ -19,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import gr.rtfm.sql2rest.model.SQLRequest;
 import gr.rtfm.sql2rest.service.SQLService;
 
 public class SQLApiTest {
