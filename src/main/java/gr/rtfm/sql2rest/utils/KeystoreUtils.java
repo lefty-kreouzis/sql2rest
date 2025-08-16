@@ -2,6 +2,8 @@ package gr.rtfm.sql2rest.utils;
 
 import java.io.FileInputStream;
 import java.security.KeyStore;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -67,5 +69,13 @@ public class KeystoreUtils {
         }
     }
 
-
+public List<String> getAliases() {
+    log.info("Getting aliases from keystore");
+    try {
+        return Collections.list(keyStore.aliases());
+    } catch (Exception e) {
+        log.error("Error getting aliases from keystore", e);
+        return Collections.emptyList();
+    }
+}
 }
